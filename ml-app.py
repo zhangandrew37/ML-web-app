@@ -4,6 +4,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 import seaborn as sb
 import base64
+from dataprep.eda import create_report
 from sklearn.ensemble import RandomForestClassifier, GradientBoostingClassifier, RandomForestRegressor
 from sklearn.svm  import SVC, LinearSVC
 from sklearn import svm
@@ -19,6 +20,7 @@ from sklearn.ensemble import AdaBoostClassifier
 from sklearn.datasets import make_classification
 from sklearn.naive_bayes import GaussianNB
 from sklearn.metrics import accuracy_score
+# will implement more later
 
 st.set_option('deprecation.showPyplotGlobalUse', False)
 
@@ -54,6 +56,7 @@ def build_model(df):
         bootstrap=parameter_bootstrap,
         oob_score=parameter_oob_score,
         n_jobs=parameter_n_jobs)
+    
     rf.fit(X_train, Y_train)
 
     st.subheader('2. Model Performance')
@@ -92,9 +95,8 @@ Try adjusting the hyperparameters!
 with st.sidebar.header('1. Upload your CSV data'):
     uploaded_file = st.sidebar.file_uploader("Upload your input CSV file", type=["csv"])
     st.sidebar.markdown("""
-[Example CSV input file]() 
+[Example CSV input file](https://raw.githubusercontent.com/zhangandrew37/ML-web-app/main/Data-AI-1.csv?token=ANATUZW67F4KGSLYWO73LMTBFBL6K) 
 """)
-#change link above to Data-AI-1.csv later
 
 # Sidebar - Specify parameter settings
 with st.sidebar.header('2. Set Parameters'):
@@ -119,9 +121,19 @@ with st.sidebar.subheader('2.2. General Parameters'):
 # Displays the dataset
 st.subheader('1. Dataset')   
 
-if uploaded_file is not None:
-    df = pd.read_csv(uploaded_file)
-    
+def generate_report():
+    left, right = st.columns(2)
+    with left:
+        if st.button('View detailed report in new tab'):
+            report = create_report(df)
+            report.show_browser()
+    with right:
+        if st.button('Download detailed report'):
+                report = create_report(df)
+                report.save('Report')
+                report.show_browser()
+
+def generate_plot():
     numeric_columns = df.select_dtypes(['float', 'int']).columns
     st.sidebar.subheader("3. Scatter Plot Setup")
     select_box1 = st.sidebar.selectbox(label='X axis', options=numeric_columns)
@@ -129,33 +141,33 @@ if uploaded_file is not None:
     sb.relplot(x=select_box1, y=select_box2, data=df)
     st.pyplot()
 
+
+if uploaded_file is not None:
+    df = pd.read_csv(uploaded_file)
+    generate_report()
+    generate_plot
     st.markdown('**1.1. Glimpse of dataset**')
     st.write(df)
     build_model(df)
 
 else:
     st.info('Awaiting for CSV file to be uploaded.')
-    if st.button('Press to use Example Dataset'):
-        example_data = open("Data-AI-1.csv")
-        df = pd.read_csv(example_data)
+    example_data = open("Data-AI-1.csv")
+    df = pd.read_csv(example_data)
+    st.write('Sample dataset provided below.')
+    temp_df = pd.DataFrame(df)
+    csv = temp_df.to_csv(index=False)
+    b64 = base64.b64encode(csv.encode()).decode()  # some strings <-> bytes conversions necessary here
+    href = f'<a href="data:file/csv;base64,{b64}">Download sample CSV File</a> (right-click and save as &lt;file_name&gt;.csv)'
+    st.markdown(href, unsafe_allow_html=True)
 
-        numeric_columns = df.select_dtypes(['float', 'int']).columns
-        st.sidebar.subheader("3. Scatter Plot Setup")
-        select_box1 = st.sidebar.selectbox(label='X axis', options=numeric_columns)
-        select_box2 = st.sidebar.selectbox(label='Y axis', options=numeric_columns)
-        sb.relplot(x=select_box1, y=select_box2, data=df)
-        st.pyplot()
+    generate_report()
+    generate_plot()
 
-        temp_df = pd.DataFrame(df)
-        csv = temp_df.to_csv(index=False)
-        b64 = base64.b64encode(csv.encode()).decode()  # some strings <-> bytes conversions necessary here
-        href = f'<a href="data:file/csv;base64,{b64}">Download CSV File</a> (right-click and save as &lt;some_name&gt;.csv)'
-        st.markdown(href, unsafe_allow_html=True)
-
-        st.markdown('**1.1. Glimpse of dataset**')
-        st.write("Wastewater treatment plant data")
-        st.write(df)
-        build_model(df)
+    st.markdown('**1.1. Glimpse of dataset**')
+    st.write("Wastewater treatment plant data")
+    st.write(df)
+    build_model(df)
 
 # hide_streamlit_style = """
 #             <style>
