@@ -24,7 +24,7 @@ from sklearn.metrics import accuracy_score
 
 st.set_option('deprecation.showPyplotGlobalUse', False)
 
-st.set_page_config(page_title='Machine Learning App', #rename
+st.set_page_config(page_title='Machine Learning App',
     layout='wide')
 
 # Model building
@@ -138,7 +138,7 @@ def generate_plot():
     st.sidebar.subheader("3. Scatter Plot Setup")
     select_box1 = st.sidebar.selectbox(label='X axis', options=numeric_columns)
     select_box2 = st.sidebar.selectbox(label='Y axis', options=numeric_columns)
-    sb.relplot(x=select_box1, y=select_box2, data=df)
+    g = sb.relplot(x=select_box1, y=select_box2, data=df, height=6, aspect=11.7/8.27)
     st.pyplot()
 
 
@@ -154,7 +154,7 @@ else:
     st.info('Awaiting for CSV file to be uploaded.')
     example_data = open("Data-AI-1.csv")
     df = pd.read_csv(example_data)
-    st.write('Sample dataset provided below.')
+    st.markdown('*Sample dataset provided below.*')
     temp_df = pd.DataFrame(df)
     csv = temp_df.to_csv(index=False)
     b64 = base64.b64encode(csv.encode()).decode()  # some strings <-> bytes conversions necessary here
