@@ -20,12 +20,58 @@ from sklearn.ensemble import AdaBoostClassifier
 from sklearn.datasets import make_classification
 from sklearn.naive_bayes import GaussianNB
 from sklearn.metrics import accuracy_score
-# will implement more later
+
+# DB Management
+import sqlite3
+conn = sqlite3.connect('data.db')
+c = conn.cursor()
+
+def create_usertable():
+	c.execute('CREATE TABLE IF NOT EXISTS userstable(username TEXT,password TEXT)')
+
+def add_userdata(username,password):
+	c.execute('INSERT INTO userstable(username,password) VALUES (?,?)',(username,password))
+	conn.commit()
+
+def login_user(username,password):
+	c.execute('SELECT * FROM userstable WHERE username =? AND password = ?',(username,password))
+	data = c.fetchall()
+	return data
 
 st.set_option('deprecation.showPyplotGlobalUse', False)
 
 st.set_page_config(page_title='Machine Learning App',
     layout='wide')
+
+menu = ["Home", "Login", "Sign Up"]
+choice = st.sidebar.selectbox("Menu", menu)
+
+if choice == "Login":
+    username = st.sidebar.text_input("Username")
+    password = st.sidebar.text_input("Password", type='password')
+    if st.sidebar.checkbox("Login"):
+        create_usertable()
+        result = login_user(username,password)
+        if result:
+            st.success("Logged In as {}".format(username))
+
+            task = st.selectbox("Task", ["Create New Project", "View Existing Projects"])
+            if task == "Create New Project":
+                st.subheader("Create a New Project")
+            elif task == "View Existing Projects":
+                st.subheader("Select Exisitng Project")
+        else:
+            st.sidebar.warning("Incorrect Username/Password")
+elif choice == "Sign Up":
+    st.subheader("Create New Account")
+    new_user = st.text_input("Username")
+    new_password = st.text_input("Password",type='password')
+
+    if st.button("Create Account"):
+        create_usertable()
+        add_userdata(new_user,new_password)
+        st.success("You have successfully created a new account")
+        st.info("Go to Login Menu to login")
 
 # Model building
 def build_model(df):
