@@ -21,6 +21,13 @@ from sklearn.datasets import make_classification
 from sklearn.naive_bayes import GaussianNB
 from sklearn.metrics import accuracy_score
 
+st.set_option('deprecation.showPyplotGlobalUse', False)
+
+st.set_page_config(page_title='Machine Learning App',
+    layout='wide')
+
+# User Authentication
+
 # DB Management
 import sqlite3
 conn = sqlite3.connect('data.db')
@@ -37,11 +44,6 @@ def login_user(username,password):
 	c.execute('SELECT * FROM userstable WHERE username =? AND password = ?',(username,password))
 	data = c.fetchall()
 	return data
-
-st.set_option('deprecation.showPyplotGlobalUse', False)
-
-st.set_page_config(page_title='Machine Learning App',
-    layout='wide')
 
 menu = ["Home", "Login", "Sign Up"]
 choice = st.sidebar.selectbox("Menu", menu)
@@ -62,6 +64,7 @@ if choice == "Login":
                 st.subheader("Select Exisitng Project")
         else:
             st.sidebar.warning("Incorrect Username/Password")
+            
 elif choice == "Sign Up":
     st.subheader("Create New Account")
     new_user = st.text_input("Username")
