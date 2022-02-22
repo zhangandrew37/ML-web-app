@@ -196,20 +196,23 @@ def user_auth():
     menu = ["Home", "Login", "Sign Up"]
     choice = st.sidebar.selectbox("Menu", menu)
 
-    if choice == "Login":
+    if choice == "Home": 
+        app()
+
+    elif choice == "Login":
         username = st.sidebar.text_input("Username")
         password = st.sidebar.text_input("Password", type='password')
         if st.sidebar.button("Login"):
             create_usertable()
             result = login_user(username,password)
             if result:
-                st.success("Logged In as {}".format(username))
+                st.success("Logged in as {}".format(username))
 
                 task = st.selectbox("Task", ["Create New Project", "View Existing Projects"])
                 if task == "Create New Project":
-                    st.subheader("Create a New Project")
+                    form()
                 elif task == "View Existing Projects":
-                    st.subheader("Select Exisitng Project")
+                    st.subheader("Select Existing Project")
             else:
                 st.sidebar.warning("Incorrect Username/Password")
 
@@ -223,6 +226,11 @@ def user_auth():
             add_userdata(new_user,new_password)
             st.success("You have successfully created a new account")
             st.info("Go to Login Menu to login")
+
+def form():
+    with st.form(key = "form1"):
+        name = st.text_input(label = "Enter the model name")
+        submit = st.form_submit_button(label= "Create Project")
 
 #---------------------------------#
 # "main"
