@@ -26,8 +26,71 @@ st.set_option('deprecation.showPyplotGlobalUse', False)
 st.set_page_config(page_title='Machine Learning App',
     layout='wide')
 
+#---------------------------------#
+# User Authentication Section
+
+# DB Management
+import sqlite3
+conn = sqlite3.connect('data.db')
+c = conn.cursor()
+
+def create_usertable():
+	c.execute('CREATE TABLE IF NOT EXISTS userstable(username TEXT,password TEXT)')
+
+def add_userdata(username,password):
+	c.execute('INSERT INTO userstable(username,password) VALUES (?,?)',(username,password))
+	conn.commit()
+
+def login_user(username,password):
+	c.execute('SELECT * FROM userstable WHERE username =? AND password = ?',(username,password))
+	data = c.fetchall()
+	return data
+
+def user_auth():
+    menu = ["Home", "Login", "Sign Up"]
+    choice = st.sidebar.selectbox("Menu", menu)
+
+    if choice == "Home": 
+        app()
+
+    elif choice == "Login":
+        username = st.sidebar.text_input("Username")
+        password = st.sidebar.text_input("Password", type='password')
+        if st.sidebar.button("Login"):
+            create_usertable()
+            result = login_user(username,password)
+            if result:
+                st.success("Logged in as {}".format(username))
+
+                task = st.selectbox("Task", ["Create New Project", "View Existing Projects"])
+                if task == "Create New Project":
+                    form()
+                elif task == "View Existing Projects":
+                    st.subheader("Select Existing Project")
+            else:
+                st.sidebar.warning("Incorrect Username/Password")
+
+    elif choice == "Sign Up":
+        st.subheader("Create New Account")
+        new_user = st.text_input("Username")
+        new_password = st.text_input("Password",type='password')
+
+        if st.button("Create Account"):
+            create_usertable()
+            add_userdata(new_user,new_password)
+            st.success("You have successfully created a new account")
+            st.info("Go to Login Menu to login")
+
+def form():
+    with st.form(key = "form1"):
+        name = st.text_input(label = "Enter the model name")
+        submit = st.form_submit_button(label= "Create Project")
+
+#---------------------------------#
+# Home Page
+
 def app():
-    #---------------------------------# #edit this later
+    #---------------------------------#
     st.write("""
     # Machine Learning App
 
@@ -173,70 +236,7 @@ def app():
         build_model()
 
 #---------------------------------#
-# User Authentication Section
-
-# DB Management
-import sqlite3
-conn = sqlite3.connect('data.db')
-c = conn.cursor()
-
-def create_usertable():
-	c.execute('CREATE TABLE IF NOT EXISTS userstable(username TEXT,password TEXT)')
-
-def add_userdata(username,password):
-	c.execute('INSERT INTO userstable(username,password) VALUES (?,?)',(username,password))
-	conn.commit()
-
-def login_user(username,password):
-	c.execute('SELECT * FROM userstable WHERE username =? AND password = ?',(username,password))
-	data = c.fetchall()
-	return data
-
-def user_auth():
-    menu = ["Home", "Login", "Sign Up"]
-    choice = st.sidebar.selectbox("Menu", menu)
-
-    if choice == "Home": 
-        app()
-
-    elif choice == "Login":
-        username = st.sidebar.text_input("Username")
-        password = st.sidebar.text_input("Password", type='password')
-        if st.sidebar.button("Login"):
-            create_usertable()
-            result = login_user(username,password)
-            if result:
-                st.success("Logged in as {}".format(username))
-
-                task = st.selectbox("Task", ["Create New Project", "View Existing Projects"])
-                if task == "Create New Project":
-                    form()
-                elif task == "View Existing Projects":
-                    st.subheader("Select Existing Project")
-            else:
-                st.sidebar.warning("Incorrect Username/Password")
-
-    elif choice == "Sign Up":
-        st.subheader("Create New Account")
-        new_user = st.text_input("Username")
-        new_password = st.text_input("Password",type='password')
-
-        if st.button("Create Account"):
-            create_usertable()
-            add_userdata(new_user,new_password)
-            st.success("You have successfully created a new account")
-            st.info("Go to Login Menu to login")
-
-def form():
-    with st.form(key = "form1"):
-        name = st.text_input(label = "Enter the model name")
-        submit = st.form_submit_button(label= "Create Project")
-
-#---------------------------------#
-# "main"
-
-user_auth()
-# app()
+user_auth() # init
 
 # hide_streamlit_style = """
 #             <style>
