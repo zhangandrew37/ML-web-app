@@ -26,7 +26,8 @@ st.set_option('deprecation.showPyplotGlobalUse', False)
 st.set_page_config(page_title='Machine Learning App',
     layout='wide')
 
-# User Authentication
+#---------------------------------#
+# User Authentication Section
 
 # DB Management
 import sqlite3
@@ -51,7 +52,7 @@ choice = st.sidebar.selectbox("Menu", menu)
 if choice == "Login":
     username = st.sidebar.text_input("Username")
     password = st.sidebar.text_input("Password", type='password')
-    if st.sidebar.checkbox("Login"):
+    if st.sidebar.button("Login"):
         create_usertable()
         result = login_user(username,password)
         if result:
@@ -64,7 +65,7 @@ if choice == "Login":
                 st.subheader("Select Exisitng Project")
         else:
             st.sidebar.warning("Incorrect Username/Password")
-            
+
 elif choice == "Sign Up":
     st.subheader("Create New Account")
     new_user = st.text_input("Username")
@@ -76,6 +77,7 @@ elif choice == "Sign Up":
         st.success("You have successfully created a new account")
         st.info("Go to Login Menu to login")
 
+#---------------------------------#
 # Model building
 def build_model(df):
     X = df.iloc[:,:-1] # Using all column except for the last column as X
@@ -107,6 +109,9 @@ def build_model(df):
         n_jobs=parameter_n_jobs)
     
     rf.fit(X_train, Y_train)
+    score = rf.score(X_train, Y_train)
+    st.write('Prediction Performance Score:')
+    st.write(score);
 
     st.subheader('2. Model Performance')
 
