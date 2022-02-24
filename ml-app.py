@@ -69,6 +69,7 @@ def user_auth():
                     st.subheader("Select Existing Project")
             else:
                 st.sidebar.warning("Incorrect Username/Password")
+        app()
 
     elif choice == "Sign Up":
         st.subheader("Create New Account")
@@ -82,9 +83,11 @@ def user_auth():
             st.info("Go to Login Menu to login")
 
 def form():
-    with st.form(key = "form1"):
+    with st.form(key = "create"):
         name = st.text_input(label = "Enter the model name")
         submit = st.form_submit_button(label= "Create Project")
+        if submit:
+            app()
 
 #---------------------------------#
 # Home Page
