@@ -21,6 +21,8 @@ from sklearn.datasets import make_classification
 from sklearn.naive_bayes import GaussianNB
 from sklearn.metrics import accuracy_score
 
+# more algorithms to be implemented later
+
 st.set_option('deprecation.showPyplotGlobalUse', False)
 
 st.set_page_config(page_title='Machine Learning App',
